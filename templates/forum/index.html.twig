@@ -1,7 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{% endblock %}
+{# équivalent de $subject->getTitle devient subject.title #}
+{# affichage d'une variable, tu appelles la CLE, pas la variable #}
 
 {% block body %}
-    Voici les sujets
+    <h2>Les derniers sujets ouverts : {{"coucoudanstwig"}}</h2>
+    {% for subject in subjects %}
+        {# date est un filter, il en existe de toute sorte comme capitalize etc. et tu le mets au format, date est particulier à gérer -> voir doc #}
+    <div class="card my-3">
+    Publié le : {{subject.published|date('d/m/y')}} à {{subject.published|date('H/i')}}
+    </div>
+  <div class="card-body">
+    <h5 class="card-title">{{subject.title}}</h5>
+    <p class="card-text">{{subject.content}}</p>
+    <a href="#" class="btn btn-primary">Voir</a>
+  </div>
+    </div>
+    {% endfor %}
 {% endblock %}
