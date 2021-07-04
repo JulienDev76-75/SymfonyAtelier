@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block body %}
+	{#subject est reconnu car on a passé dans le controller "subject" => $subject #}
+	<h2>{{subject.title}}</h2>
+	<div class="card my-3">
+		Publié le :
+		{{subject.published|date('d/m/y')}}
+		à
+		{{subject.published|date('H/i')}}
+		Par : {{subject.user.firstname ~ " " ~ subject.user.lastname}}{#depuis mon objet subject j'accède à user, et du coup je peux accéder à l'attribut firstname et grâce à l'assocation#}
+	</div>
+<div class="card-body">
+		<h5 class="card-title">{{subject.title}}</h5>
+		<p class="card-text">{{subject.content}}</p>
+	</div>
+	<hr>
+	<h3>Réponse au sujet : </h3>
+	{% if subject.answers is not empty %}
+		{% for answer in subject.answers %}
+		<div class="card header"
+		Publié le :
+		{{answer.published|date('d/m/y')}}
+		à
+		{{answer.published|date('H/i')}}
+		Par : {{answer.user.firstname ~ " " ~ answer.user.lastname}}
+	{% else %}
+	 <div class="alert alert-secondary">Pas encore de réponse</div>
+	 {% endif %}
+	 <h3>
+	 Poster une réponse</h3>
+	 {{form(form)}}
+	
+{% endblock %}

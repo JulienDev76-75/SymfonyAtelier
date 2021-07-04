@@ -5,17 +5,21 @@
 {# affichage d'une variable, tu appelles la CLE, pas la variable #}
 
 {% block body %}
-    <h2>Les derniers sujets ouverts : {{"coucoudanstwig"}}</h2>
-    {% for subject in subjects %}
-        {# date est un filter, il en existe de toute sorte comme capitalize etc. et tu le mets au format, date est particulier à gérer -> voir doc #}
-    <div class="card my-3">
-    Publié le : {{subject.published|date('d/m/y')}} à {{subject.published|date('H/i')}}
-    </div>
-  <div class="card-body">
-    <h5 class="card-title">{{subject.title}}</h5>
-    <p class="card-text">{{subject.content}}</p>
-    <a href="#" class="btn btn-primary">Voir</a>
-  </div>
-    </div>
-    {% endfor %}
-{% endblock %}
+<h2>Les derniers sujets ouverts :
+	{{"coucoudanstwig"}}</h2>
+{% for subject in subjects %}
+	{# date est un filter, il en existe de toute sorte comme capitalize etc. et tu le mets au format, date est particulier à gérer -> voir doc #}
+	<div class="card my-3">
+		Publié le :
+		{{subject.published|date('d/m/y')}}
+		à
+		{{subject.published|date('H/i')}}
+		Par : {{subject.user.firstname ~ " " ~ subject.user.lastname}}{#depuis mon objet subject j'accède à user, et du coup je peux accéder à l'attribut firstname et grâce à l'assocation#}
+	</div>
+	<div class="card-body">
+		<h5 class="card-title">{{subject.title}}</h5>
+		<p class="card-text">{{subject.content}}</p>
+		{#fonction path qui pointe vers la route single, url génére qui sera à l'id sur lequel on a cliqué#}
+		<a href="{{path('single', {id:subject.id}) }}" class="btn btn-primary">Voir</a>
+	</div>
+</div>{% endfor %}{% endblock %}
