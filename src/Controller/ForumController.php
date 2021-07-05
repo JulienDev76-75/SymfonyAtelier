@@ -13,7 +13,10 @@ use App\Entity\Subject;
 use App\Form\SubjectType;
 use App\Entity\Answer;
 use App\Entity\AnswerType;
+use App\Form\CommentType;
+use App\Entity\Comment;
 use App\Repository\SubjectRepository;
+use App\Repository\AnswerRepository;
 
 class ForumController extends AbstractController
 {
@@ -107,7 +110,7 @@ class ForumController extends AbstractController
             $answer->setPublished(new \DateTime());
             $answer->setUser($this->GetUser()); 
             $answer->setSubject($answer);
-            $entityManager = $this->getDoctrine()->getManager()
+            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($answer);
             $entityManager->flush();
 
@@ -118,13 +121,11 @@ class ForumController extends AbstractController
             "form" => $form->createview()
 
         ]);
-        //comme si tu faisais $formcontroller = new forumcontroller () et ensuite $formcontroller ->single($_Get["id"])
     }
 
     #[Route('/user/subjects', name: 'userSubjects')]
     public function userSubjects(): Response
     {
-
         //je veux QUE les sujets de l'utilisateur connecté
         //findby recherche par sujet et user OU alors :
         $subjects = $this->getUser()->getSubjects(); //on accède à la session de l'User, donc ce sont SES sujets à lui, et après on récupére les sujets qui seront liés à lui
@@ -133,7 +134,40 @@ class ForumController extends AbstractController
         ]);
         //$this->getUser = on accède à l'user en session
     }
+
+
+
+    #[Route('/comment', name: 'newComment'), requirements={"answerId"="\d+"}]
+    public function newComment(Request $request, AnswerRepository $answerRepository, int $answerId): Response
+    { 
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        //là tu gère la soumission, va me chercher les valeurs et hydrate moi avec les données du formulaire si elles sont valides: 
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+        $comment->setPublished(new \DateTime());
+        //là on cherche l'user connecté :
+        $comment->setUser($this->getUser());
+        //avant d'associer ma réponse a un commentaire, je vais chercher l'answer en bdd, je vais chercher la réponse qui correspond à l'i passée en URL
+        $answer = $answerRepository->find($answerId);
+        $comment->setAnswer();
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($comment);
+        $entityManager->flush();
+
+        //la route signel attends le paramètre id du sujet posté, redirige la route avec le bon paramètre
+        //je suiis sur de envoyer vers la page single DU sujet DE LA R2PONSE SUR LAQUELLE J4AVAIS CLIQU2
+        return $this->redirectToRoute('single', ["id" => $answer->getSubject()->getId()])
+        }
+        return $this->render('forum/newComment.html.twig', [
+            "form" => $form->createView()
+        ]);
+
+    }
 }
+
+
+
 
 //relation entre table : clé primaire et FK, relation 0 to many(n), 0 quand c'est nullable
 //la fk est tjrs du côté many, un user est peut écrire plusieurs sujets
